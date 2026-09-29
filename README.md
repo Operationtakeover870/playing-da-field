@@ -1,16 +1,30 @@
 # PLAYING DA FIELD
 
-Dating app with swipe profiles, matching, a social feed, and MySpace-style
-pages with profile songs and a Top 4.
+A mobile-first dating app prototype with discovery, matching, messages, profile pages, and visible safety guidance.
 
-## Run it
+## What the prototype does
 
-Open `index.html` in a browser — everything is bundled in one file,
-no build step needed.
+- Browse a swipe-style discovery deck
+- Like or pass on demo profiles
+- See mutual connections and trigger a match moment
+- Message in a responsive chat view
+- Navigate a personal profile page
+- Surface clear privacy and safety reminders
 
-## Deploy it
+The profiles are fictional demo content. Everything runs in the browser and resets on refresh—no personal data, accounts, or messages are saved yet.
 
-This single file deploys anywhere static sites run:
-- **GitHub Pages**: repo Settings → Pages → Deploy from branch → main
-- **Render**: New → Static Site → publish directory `.`
-- **Netlify / Vercel**: drag and drop the folder
+## Run or deploy
+
+Open `index.html` in a browser. It is a single static file and can deploy to GitHub Pages, Render Static Sites, Netlify, or Vercel.
+
+## Production roadmap
+
+Before inviting real users, add:
+
+1. Account authentication and verified age gates
+2. A secure database for profiles, likes, matches, and messages
+3. Image upload, moderation, reporting, blocking, and human review tools
+4. Rate limits, privacy controls, and consent-focused location sharing
+5. Terms of service, privacy policy, and customer support paths
+
+Never use the demo profiles or sample conversations as real people or real activity.
