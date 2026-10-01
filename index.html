@@ -94,9 +94,45 @@
     }
     @media(max-width:380px){.topline h1{font-size:21px}.status-strip{grid-template-columns:1fr}.status-strip .status:last-child{grid-column:auto}.actions.four{grid-template-columns:1fr 1fr}.compat{width:100%;justify-content:center}.voice-play{width:100%;justify-content:center}}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}.match-pop-inner{animation:none}}
+
+    .auth-gate{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:18px;background:radial-gradient(circle at 18px 18px,rgba(44,99,191,.10) 2px,transparent 2.5px) 0 0/36px 36px,#152d63;overflow:auto}
+    .auth-card{width:min(430px,100%);background:var(--paper);border:3px solid var(--navy);box-shadow:9px 9px 0 var(--coral);padding:26px 22px}
+    .auth-card h1{font:34px/1 "Bree Serif";color:var(--navy);margin:0}
+    .auth-card h1 span{color:var(--coral)}
+    .auth-sub{color:var(--muted);font-weight:700;margin:6px 0 16px}
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+    .auth-tabs button{border:2px solid var(--navy);background:#fff;padding:10px;font-weight:800;cursor:pointer;min-height:46px}
+    .auth-tabs button.active{background:var(--navy);color:#fff}
+    .auth-msg{margin:10px 0;padding:10px 12px;background:#fff6d1;border:1.5px solid var(--orange);font-size:13px;line-height:1.5;font-weight:600}
+    .auth-msg.err{background:#ffe9e4;border-color:var(--coral)}
+    .auth-go{width:100%;margin-top:14px;min-height:50px;border:2px solid var(--navy);background:var(--coral);color:#fff;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 var(--navy);font-size:15px}
+    .auth-go:active{transform:translate(3px,3px);box-shadow:none}
+    .auth-go:disabled{opacity:.55;cursor:wait}
+    .auth-fine{margin:14px 0 0;font-size:11px;color:var(--muted);text-align:center;line-height:1.6}
+    .photo-initial{width:100%;height:100%;display:grid;place-items:center;background:var(--yellow);font:110px "Bree Serif";color:var(--navy)}
+    .setup-preview{width:120px;height:120px;object-fit:cover;border:2px solid var(--navy);margin-top:8px;display:block}
   </style>
 </head>
 <body>
+  <div class="auth-gate" id="authGate" hidden>
+    <div class="auth-card">
+      <h1>PLAYING DA FIELD <span>&hearts;</span></h1>
+      <p class="auth-sub">Meet somebody real.</p>
+      <div class="auth-tabs"><button type="button" id="tabLogin" class="active">LOG IN</button><button type="button" id="tabSignup">SIGN UP</button></div>
+      <div id="authForm">
+        <label class="field"><span>EMAIL</span><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
+        <label class="field"><span>PASSWORD</span><input id="authPass" type="password" autocomplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></label>
+        <div class="auth-msg" id="authMsg" hidden></div>
+        <button type="button" class="auth-go" id="authGo">LOG IN</button>
+      </div>
+      <div id="authCheckEmail" hidden>
+        <div class="auth-msg"><strong>Check your email.</strong><br>We sent a confirmation link to <strong id="authCheckAddr"></strong>. Tap it, then come back here.</div>
+        <button type="button" class="auth-go" id="authConfirmed">I CONFIRMED &mdash; LET ME IN</button>
+      </div>
+      <p class="auth-fine">Real people only &middot; 18+ &middot; Be kind out there.<br>You stay logged in on this device until you log out.</p>
+    </div>
+  </div>
+
   <div class="shell">
     <aside class="side left">
       <nav class="nav-card" aria-label="Main navigation">
@@ -104,13 +140,14 @@
         <button class="nav-btn" data-view="feed"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg>The Loop</button>
         <button class="nav-btn" data-view="matches"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM19 8v6M22 11h-6"/></svg>Matches</button>
         <button class="nav-btn" data-view="myprofile"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>My page</button>
+        <button class="nav-btn logout-btn"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Log out</button>
       </nav>
       <div class="side-note"><strong>Your profile song</strong><p>Pick the one track that tells people who you are before you say a word.</p></div>
     </aside>
 
     <main>
-      <div class="topline"><h1>PLAYING DA FIELD <span>— meet somebody real.</span></h1><div class="location">Within 25 miles</div></div>
-      <div class="status-strip"><div class="status"><b>●</b> Demo activity</div><div class="status">3 demo matches</div><div class="status">All people and activity shown are fictional demos</div></div>
+      <div class="topline"><h1>PLAYING DA FIELD <span>— meet somebody real.</span></h1><div style="display:flex;gap:8px"><div class="location">Within 25 miles</div><button type="button" class="location logout-btn" style="cursor:pointer">Log out</button></div></div>
+      <div class="status-strip"><div class="status"><b>●</b> Live</div><div class="status">Real people only</div><div class="status">18+ · Be kind out there</div></div>
       <aside class="safety-banner" aria-label="Dating safety reminder"><div><strong>Meet smart. Keep control.</strong><p>Stay in the app, meet in public, tell somebody your plan, and never send money.</p></div><button type="button" id="openSafety">SAFE DATING TIPS</button></aside>
 
       <section id="discover" class="view active" aria-label="Discover profiles">
@@ -123,22 +160,13 @@
 
       <section id="feed" class="view" aria-label="Social feed">
         <div class="feed-head"><h2>The Loop</h2><span>FROM PEOPLE NEARBY</span></div>
-        <article class="feed-card">
-          <div class="feed-user"><img src="assets/media-generation-nina-profile-0-a6eb8854-54a5-4e32-b494-3c21e9272917.webp" alt="Illustrated portrait of fictional demo profile Nina"><div><strong>Nina <span class="demo-tag">DEMO</span></strong><small> shared a demo thought · 18 min</small></div></div>
-          <p class="feed-copy">Saturday plans: farmer's market, iced coffee, then finding a movie nobody in the group has seen yet. Who's got a recommendation?</p>
-          <div class="feed-actions"><button class="react">Like <span>12</span></button><button data-profile="2">View profile</button></div>
-        </article>
-        <article class="feed-card">
-          <div class="feed-user"><img src="assets/media-generation-jordan-profile-0-17342576-db88-4b72-9849-18ab667d0836.webp" alt="Illustrated portrait of fictional demo profile Jordan"><div><strong>Jordan <span class="demo-tag">DEMO</span></strong><small> updated his demo status · 1 hr</small></div></div>
-          <p class="feed-copy">Current mood: rooftop weather, old R&amp;B, and absolutely no emails after 6.</p>
-          <img class="feed-photo" src="assets/media-generation-jordan-profile-0-17342576-db88-4b72-9849-18ab667d0836.webp" alt="Illustration of fictional demo profile Jordan laughing on a rooftop at sunset">
-          <div class="feed-actions"><button class="react">Like <span>27</span></button><button data-profile="1">View profile</button></div>
-        </article>
+        <div class="empty-card"><h2>The Loop is quiet&hellip; for now.</h2><p>Real posts from real people will show up here once the community grows.</p></div>
+        
       </section>
 
       <section id="matches" class="view" aria-label="Matches">
         <div class="feed-head"><h2>Your people</h2><span>CONNECTIONS &amp; INBOX</span></div>
-        <div class="shot-log" id="shotLog"><div class="panel-title">Shoot your shot inbox <span id="shotTotal">1</span></div><div id="shotItems"><div class="shot-item"><strong>From Jordan:</strong> Rooftop weather and good tacos? I had to shoot my shot. <small>Received before matching</small></div></div></div>
+        <div class="shot-log" id="shotLog"><div class="panel-title">Shoot your shot inbox <span id="shotTotal">0</span></div><div id="shotItems"><div class="shot-item">No shots yet. When somebody shoots their shot at you, it lands here.</div></div></div>
         <div class="matches-grid" id="matchesGrid"></div>
       </section>
 
@@ -148,6 +176,7 @@
         <article class="profile-page">
           <div class="profile-banner"></div>
           <div class="profile-page-body">
+            <div id="myRealHead"></div>
             <div style="display:flex;justify-content:space-between;align-items:end;gap:12px"><div><div class="avatar-big" style="display:grid;place-items:center;background:var(--yellow);font:42px 'Bree Serif';color:var(--navy)">YOU</div><h2 class="page-name">Your page</h2></div><span class="mood">Mood: feeling good</span></div>
             <div class="page-grid"><div class="bio-box"><h3>About me</h3><p>Add the story only you can tell: what you care about, what makes you laugh, and what kind of connection you're looking for.</p></div><div class="bio-box soundtrack-editor"><h3>Profile soundtrack</h3><p><strong id="songStatus">No song picked yet.</strong><br>Put one song at the top of your page, MySpace-style.</p><div class="song-empty" id="songEmpty">Choose an audio file from your phone to preview how your profile song would look and play.</div><div class="song-player" id="songPlayer"><div class="song-meta"><div class="song-note">♪</div><div class="song-title"><strong id="songName">Your profile song</strong><span>Visitors press play to listen</span></div></div><audio id="profileAudio" controls preload="metadata"></audio></div><div class="song-actions"><label class="song-pick" for="profileSong" id="songPickLabel">ADD A SONG</label><input id="profileSong" type="file" accept="audio/*" hidden><button class="song-remove" id="removeSong" type="button" hidden>REMOVE</button></div><div class="song-help">MP3, M4A, or WAV · Preview stays in this tab only.</div></div><div class="bio-box voice-studio"><h3>15-second voice intro</h3><p>Let people hear your vibe before they swipe. Record a quick intro, then play it back before adding it to your sample page.</p><div class="record-row"><button class="record-btn" id="recordVoice" type="button">RECORD INTRO</button><button class="record-btn stop" id="stopVoice" type="button" hidden>STOP</button><span class="timer" id="voiceTimer">0:15</span><span class="song-help" id="voiceStatus">Microphone permission is requested when you record.</span></div><audio class="voice-preview" id="voicePreview" controls hidden></audio><div class="song-help">The recording stays in this tab only and stops automatically at 15 seconds.</div></div><div class="bio-box voice-studio"><h3>Music match setup</h3><p>Add the real title and artist from your profile song, then pick your Top 4. Compatibility recalculates from those details—never a manually chosen genre.</p><div class="music-setup"><div class="top4-setup"><label class="field"><span>PROFILE SONG TITLE</span><input id="userSongTitle" type="text" maxlength="80" placeholder="Example: Golden"></label><label class="field"><span>PROFILE SONG ARTIST</span><input id="userSongArtist" type="text" maxlength="80" placeholder="Example: Jill Scott"></label></div><div class="top4-setup"><label class="field"><span>TOP 4 · #1</span><select class="top4-pick"><option value="">Choose</option><option>Jill Scott</option><option>A Tribe Called Quest</option><option>The Temper Trap</option><option>The Gap Band</option><option>SZA</option><option>Outkast</option><option>Victoria Monét</option><option>Anderson .Paak</option></select></label><label class="field"><span>TOP 4 · #2</span><select class="top4-pick"><option value="">Choose</option><option>Jill Scott</option><option>A Tribe Called Quest</option><option>The Temper Trap</option><option>The Gap Band</option><option>SZA</option><option>Outkast</option><option>Victoria Monét</option><option>Anderson .Paak</option></select></label><label class="field"><span>TOP 4 · #3</span><select class="top4-pick"><option value="">Choose</option><option>Jill Scott</option><option>A Tribe Called Quest</option><option>The Temper Trap</option><option>The Gap Band</option><option>SZA</option><option>Outkast</option><option>Victoria Monét</option><option>Anderson .Paak</option></select></label><label class="field"><span>TOP 4 · #4</span><select class="top4-pick"><option value="">Choose</option><option>Jill Scott</option><option>A Tribe Called Quest</option><option>The Temper Trap</option><option>The Gap Band</option><option>SZA</option><option>Outkast</option><option>Victoria Monét</option><option>Anderson .Paak</option></select></label></div><div class="song-help" id="musicSetupStatus">Enter your profile song title and artist, then pick at least one Top 4 artist to calculate scores.</div></div></div></div>
             <div class="friend-wall"><div class="panel-title">Your Top 4</div><div style="padding:22px;text-align:center;color:var(--muted);font-size:14px">The people you connect with can show up here.</div></div>
@@ -159,7 +188,7 @@
     </main>
 
     <aside class="side right">
-      <section class="panel"><div class="panel-title">Demo matches <span>3</span></div><div class="match-list" id="miniMatches"></div></section>
+      <section class="panel"><div class="panel-title">Matches</div><div class="match-list" id="miniMatches"></div></section>
       <section class="panel" style="margin-top:16px"><div class="panel-title">Your Top 4</div><div class="top8" id="topEight"></div></section>
     </aside>
   </div>
@@ -175,16 +204,13 @@
   <div class="modal" id="iceModal" role="dialog" aria-modal="true" aria-labelledby="iceTitle"><div class="modal-card"><h2 id="iceTitle">Two truths &amp; a lie</h2><p id="iceHint">Pick the statement you think is the lie. Get it right to unlock chat.</p><div class="ice-list" id="iceList"></div><div class="ice-result" id="iceResult" aria-live="polite"></div><div class="modal-actions"><button type="button" data-close="iceModal">Not now</button></div></div></div>
   <div class="modal" id="planModal" role="dialog" aria-modal="true" aria-labelledby="planTitle"><div class="modal-card"><h2 id="planTitle">Plan the date</h2><p>Pick a spot, day, and time together without leaving the conversation.</p><label class="field"><span>SPOT</span><select id="planSpot"><option>Coffee shop</option><option>Casual restaurant</option><option>Park walk</option><option>Live music</option><option>Movie theater</option></select></label><label class="field"><span>DAY</span><input id="planDay" type="date"></label><label class="field"><span>TIME</span><input id="planTime" type="time"></label><div class="privacy-note">Choose a public place, arrange your own ride, and tell somebody you trust. Do not add a home address here.</div><div class="modal-actions"><button type="button" data-close="planModal">Cancel</button><button class="primary" id="savePlan" type="button">ADD TO CHAT</button></div></div></div>
   <div class="modal" id="safetyModal" role="dialog" aria-modal="true" aria-labelledby="safetyTitle"><div class="modal-card"><h2 id="safetyTitle">Date safe, every time</h2><p>Your privacy and safety matter more than any match.</p><div class="safety-list"><div class="safety-tip"><b>1</b><div><strong>Keep personal details private</strong><span>Do not share your home address, financial information, passwords, or private codes.</span></div></div><div class="safety-tip"><b>2</b><div><strong>Meet in public</strong><span>Choose a busy place, arrange your own ride, and tell a trusted person where you will be.</span></div></div><div class="safety-tip"><b>3</b><div><strong>Never send money</strong><span class="danger-note">Anyone asking for money, gift cards, investments, or transfer codes is a red flag.</span></div></div><div class="safety-tip"><b>4</b><div><strong>Trust your instincts</strong><span>Leave, block, or report if somebody pressures you or makes you uncomfortable. Call emergency services if you are in immediate danger.</span></div></div></div><div class="privacy-note"><strong>Privacy reminder:</strong> Voice intros, profile songs, and date details can reveal personal information. Share only what you are comfortable making visible.</div><div class="modal-actions"><button class="primary" type="button" data-close="safetyModal">GOT IT</button></div></div></div>
+  <div class="modal" id="setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle"><div class="modal-card"><h2 id="setupTitle">Set up your page</h2><p>This is what other real people will see. Keep it honest.</p><label class="field"><span>DISPLAY NAME *</span><input id="setupName" type="text" maxlength="30" placeholder="What should people call you?"></label><label class="field"><span>AGE * &mdash; 18 OR OLDER</span><input id="setupAge" type="number" min="18" max="99" inputmode="numeric" placeholder="25"></label><label class="field"><span>BIO</span><textarea id="setupBio" maxlength="500" placeholder="A little about you..."></textarea></label><label class="field"><span>PHOTO (OPTIONAL)</span><input id="setupPhoto" type="file" accept="image/*"></label><img class="setup-preview" id="setupPreview" hidden alt="Photo preview"><div class="auth-msg" id="setupMsg" hidden></div><div class="modal-actions"><button type="button" id="setupCancel">Cancel</button><button class="primary" id="saveProfile" type="button">SAVE MY PAGE</button></div></div></div>
   <div class="toast" id="toast" role="status"></div>
   <div class="match-pop" id="matchPop" role="dialog" aria-modal="true" aria-labelledby="matchTitle"><div class="match-pop-inner"><div class="match-kicker">THE FEELING IS MUTUAL</div><h2 id="matchTitle">It's a match!</h2><p id="matchCopy"></p><div class="pair"><div style="width:100px;height:100px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;border:4px solid white;outline:2px solid var(--navy);font-weight:800">YOU</div><img id="matchImg" src="assets/media-generation-maya-profile-0-7703fdb3-27e9-4345-bd98-5b53fddb58ba.webp" alt="Your new match"></div><button class="primary" id="openChat">See conversation</button><button id="keepLooking">Keep looking</button></div></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const profiles=[
-      {name:'Maya',age:28,city:'Downtown',distance:'Sample distance · 3 miles',img:'assets/media-generation-maya-profile-0-7703fdb3-27e9-4345-bd98-5b53fddb58ba.webp',intro:'assets/maya-intro.mp3',tag:'Vinyl collector · Sunday brunch loyalist',bio:'Equal parts homebody and last-minute adventure. I make elite playlists, remember your coffee order, and will absolutely beat you at trivia.',chips:['R&B','Brunch','Road trips'],mood:'Mood: somebody play the slow jams',song:'“Golden” — Jill Scott',songTitle:'Golden',songArtist:'Jill Scott',top4:['Jill Scott','SZA','Victoria Monét','Anderson .Paak'],wall:'Your record-store photo is a whole vibe.',message:'Okay, serious question: what song are you putting on first for a road trip?',truths:['I own more than 200 vinyl records.','I have never had coffee.','I once won a city trivia night.'],lie:1},
-      {name:'Jordan',age:31,city:'Midtown',distance:'Sample distance · 6 miles',img:'assets/media-generation-jordan-profile-0-17342576-db88-4b72-9849-18ab667d0836.webp',intro:'assets/jordan-intro.mp3',tag:'Good food · Better stories · Zero dry texting',bio:'Designer by day, amateur chef by night. Looking for somebody kind, funny, and willing to judge my taco experiments honestly.',chips:['Cooking','Live music','Travel'],mood:'Mood: rooftop weather',song:'“Can I Kick It?” — A Tribe Called Quest',songTitle:'Can I Kick It?',songArtist:'A Tribe Called Quest',top4:['A Tribe Called Quest','Outkast','Anderson .Paak','SZA'],wall:'Still waiting on that taco invite.',message:'You seem fun. Are we getting tacos or pretending we can agree on a movie?',truths:['I make my own hot sauce.','I have been to twelve countries.','I cannot cook rice.'],lie:2},
-      {name:'Nina',age:29,city:'East Side',distance:'Sample distance · 9 miles',img:'assets/media-generation-nina-profile-0-a6eb8854-54a5-4e32-b494-3c21e9272917.webp',intro:'assets/nina-intro.mp3',tag:'Film camera always in the bag',bio:'Weekend markets, indie movies, plants I mostly keep alive. I like curious people and conversations that wander somewhere unexpected.',chips:['Photography','Markets','Movies'],mood:'Mood: chasing good light',song:'“Sweet Disposition” — The Temper Trap',songTitle:'Sweet Disposition',songArtist:'The Temper Trap',top4:['The Temper Trap','SZA','Victoria Monét','Outkast'],wall:'That market had the best peaches.',message:'Your profile passed the vibe check. What is your perfect lazy Sunday?',truths:['I develop my own film.','I have six houseplants.','I hate every kind of peach.'],lie:2},
-      {name:'Marcus',age:33,city:'West End',distance:'Sample distance · 12 miles',img:'assets/media-generation-marcus-profile-0-b16f8189-e45f-4c15-9e6e-2ad795b9c663.webp',intro:'assets/marcus-intro.mp3',tag:'Classic cars · Fresh air · Family first',bio:'I can fix almost anything, grill in any weather, and never skip the opening credits. Here for something steady with somebody who laughs easy.',chips:['Cars','Cookouts','Old-school soul'],mood:'Mood: windows down',song:'“Outstanding” — The Gap Band',songTitle:'Outstanding',songArtist:'The Gap Band',top4:['The Gap Band','Jill Scott','Anderson .Paak','Outkast'],wall:'The convertible is clean. Respect.',message:'I gotta know—which old-school song never gets skipped when it comes on?',truths:['I rebuilt my first engine at sixteen.','I never watch movie credits.','I make the family cookout playlist.'],lie:1}
-    ];
+    let profiles=[];
     let index=0,current=0; const matched=new Set([0,2,3]), unlocked=new Set(), plans={}, shots=[];
     const incomingShots=[{i:1,text:'Rooftop weather and good tacos? I had to shoot my shot.'}],userMusic={songTitle:'',songArtist:'',audioName:'',top4:[]};
     const deck=document.getElementById('deck'), toast=document.getElementById('toast');
@@ -200,15 +226,16 @@
     function musicMatchMarkup(p){const m=musicMatch(p);return m?`<span class="compat"><strong>${m.score}%</strong> music match</span><small>${m.sameSong?'Same profile song':m.artistMatch?'Same profile-song artist':'Different profile songs'} · ${m.overlap} Top 4 overlap</small>`:`<span class="compat"><strong>—</strong> music match</span><small>Add a song title, artist, and Top 4 on My page</small>`}
     let playingIntro=null;
     function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+    function escS(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+    function likeReal(){const p=profiles[index];if(!p)return;showToast(`You liked ${p.name} \u2014 fingers crossed it\u2019s mutual`);index++;renderDeck()}
     function renderDeck(){
-      if(index>=profiles.length){deck.innerHTML='<div class="empty-card"><h2>You reached the end nearby.</h2><p>Good run. Check your matches or come back later for a fresh batch.</p><button class="action like" style="padding:10px 18px;min-height:0" onclick="index=0;renderDeck()">Start over</button></div>';return}
-      const p=profiles[index];
-      deck.innerHTML=`<article class="profile-card"><div class="photo-wrap"><img src="${p.img}" alt="Illustrated portrait of fictional demo profile ${p.name}"><div class="online">FICTIONAL DEMO</div></div><div class="profile-info"><div class="profile-title"><h2>${p.name}, ${p.age}<span class="verified">✓</span><span class="demo-tag">DEMO</span></h2><span class="distance">${p.distance}</span></div><p class="headline"><strong>${p.tag}</strong><br>${p.bio}</p><div class="chips">${p.chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div><div class="feature-row">${musicMatchMarkup(p)}<button class="voice-play" type="button" data-intro="${index}"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 9v6M10 6v12M14 3v18M18 8v8"/></svg><span>Play voice intro</span></button></div><div class="actions four"><button class="action pass" aria-label="Pass" id="passBtn">×</button><button class="action like" id="likeBtn">LIKE</button><button class="action shot" id="shotBtn">SHOOT<br>YOUR SHOT</button><button class="action profile" aria-label="View full profile" id="profileBtn">+</button></div><div class="counter">Profile ${index+1} of ${profiles.length}</div></div></article>`;
-      document.getElementById('passBtn').onclick=()=>{index++;showToast('Passed — next profile');renderDeck()};
-      document.getElementById('likeBtn').onclick=()=>makeMatch(index);
-      document.getElementById('shotBtn').onclick=()=>openShot(index);
+      if(!profiles.length){deck.innerHTML='<div class="empty-card"><h2>Nobody here yet.</h2><p>You are early \u2014 that is a good thing. Share the link so there is somebody to meet.</p></div>';return}
+      if(index>=profiles.length){deck.innerHTML='<div class="empty-card"><h2>That is everybody for now.</h2><p>Good run. Check back later for fresh faces.</p><button class="action like" style="padding:10px 18px;min-height:0" onclick="index=0;renderDeck()">Start over</button></div>';return}
+      const p=profiles[index],initial=(p.name||'P').trim().charAt(0).toUpperCase();
+      deck.innerHTML=`<article class="profile-card"><div class="photo-wrap">${p.img?`<img src="${escS(p.img)}" alt="Photo of ${escS(p.name)}">`:`<div class="photo-initial">${escS(initial)}</div>`}</div><div class="profile-info"><div class="profile-title"><h2>${escS(p.name)}, ${p.age}</h2></div>${p.bio?`<p class="headline">${escS(p.bio)}</p>`:''}<div class="actions"><button class="action pass" aria-label="Pass" id="passBtn">\u00d7</button><button class="action like" id="likeBtn">LIKE</button><button class="action profile" aria-label="View full profile" id="profileBtn">+</button></div><div class="counter">Profile ${index+1} of ${profiles.length}</div></div></article>`;
+      document.getElementById('passBtn').onclick=()=>{index++;renderDeck()};
+      document.getElementById('likeBtn').onclick=likeReal;
       document.getElementById('profileBtn').onclick=()=>openProfile(index);
-      document.querySelector('[data-intro]').onclick=e=>playIntro(index,e.currentTarget);
     }
     function showToast(msg){toast.textContent=msg;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1800)}
     function playIntro(i,button){
@@ -221,11 +248,16 @@
     document.getElementById('openChat').onclick=()=>{document.getElementById('matchPop').classList.remove('show');openChat(current)};
     function switchView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'smooth'})}
     document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
-    function openProfile(i){const p=profiles[i];document.getElementById('profile').innerHTML=`<article class="profile-page"><div class="profile-banner"></div><div class="profile-page-body"><div style="display:flex;justify-content:space-between;align-items:end;gap:12px"><div><img class="avatar-big" src="${p.img}" alt="Illustrated portrait of ${p.name}"><h2 class="page-name">${p.name}, ${p.age} <span class="demo-tag">FICTIONAL DEMO</span></h2></div><span class="mood">${p.mood}</span></div><p class="headline">${p.city} · ${p.distance}</p><div class="feature-row">${musicMatchMarkup(p)}<button class="voice-play" type="button" onclick="playIntro(${i},this)"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 9v6M10 6v12M14 3v18M18 8v8"/></svg><span>Play voice intro</span></button></div><div class="page-grid"><div class="bio-box"><h3>About me</h3><p>${p.bio}</p></div><div class="bio-box"><h3>Profile soundtrack</h3><p><strong>${p.song}</strong><br><span style="color:var(--muted)">The song at the top of ${p.name}'s page.</span></p></div></div><div class="friend-wall"><div class="panel-title">Friend wall</div><div class="wall-post"><img src="${profiles[(i+1)%profiles.length].img}" alt=""><div><strong>${profiles[(i+1)%profiles.length].name}</strong><p>${p.wall}</p><small>Yesterday</small></div></div><div class="wall-post"><img src="${profiles[(i+2)%profiles.length].img}" alt=""><div><strong>${profiles[(i+2)%profiles.length].name}</strong><p>Top 8 energy. Always.</p><small>3 days ago</small></div></div></div><div class="actions four"><button class="action pass" onclick="switchView('discover')">←</button><button class="action like" onclick="makeMatch(${i})">LIKE</button><button class="action shot" onclick="openShot(${i})">SHOOT YOUR SHOT</button><button class="action profile" aria-label="${matched.has(i)?'Open conversation':'Conversation locked until matched'}" onclick="openChat(${i})" ${matched.has(i)?'':'disabled'}>${matched.has(i)?'✉':'⌁'}</button></div></div></article>`;switchView('profile')}
-    function renderMatches(){const arr=[...matched].map(i=>profiles[i]);const grid=document.getElementById('matchesGrid');grid.innerHTML=arr.map(p=>{const i=profiles.indexOf(p),ready=unlocked.has(i),m=musicMatch(p);return `<article class="match-tile"><img src="${p.img}" alt="Illustrated portrait of ${p.name}"><div><h3>${p.name}, ${p.age} <span class="demo-tag">DEMO</span></h3><p>${m?`${m.score}% · ${m.sameSong?'same song':m.artistMatch?'same song artist':'different profile songs'} · ${m.overlap} Top 4 overlap`:'Music score needs your song title, artist, and Top 4'}</p></div><button onclick="${ready?`openChat(${i})`:`openIcebreaker(${i})`}">${ready?'Open conversation':'Play & unlock chat'}</button></article>`}).join('');
-      document.getElementById('miniMatches').innerHTML=arr.slice(0,3).map(p=>{const i=profiles.indexOf(p);return `<div class="mini-match" onclick="${unlocked.has(i)?`openChat(${i})`:`openIcebreaker(${i})`}"><img src="${p.img}" alt=""><div><strong>${p.name} <span class="demo-tag">DEMO</span></strong><small>${unlocked.has(i)?'Chat unlocked':'Icebreaker waiting'}</small></div></div>`}).join('');
-      document.getElementById('topEight').innerHTML=profiles.map((p,i)=>`<button onclick="openProfile(${i})"><img src="${p.img}" alt="Illustrated portrait of ${p.name}">${p.name}</button>`).join('');renderShots()}
-    function renderShots(){document.getElementById('shotTotal').textContent=shots.length+incomingShots.length;const incoming=incomingShots.map(s=>`<div class="shot-item"><strong>From ${profiles[s.i].name} (demo):</strong> ${esc(s.text)} <small>Received before matching</small></div>`).join(''),sent=shots.map(s=>`<div class="shot-item"><strong>To ${profiles[s.i].name}:</strong> ${esc(s.text)} <small>Delivered to ${profiles[s.i].name}'s inbox</small></div>`).join('');document.getElementById('shotItems').innerHTML=incoming+sent}
+    function openProfile(i){const p=profiles[i];if(!p)return;const initial=(p.name||'P').trim().charAt(0).toUpperCase();
+      document.getElementById('profile').innerHTML=`<article class="profile-page"><div class="profile-banner"></div><div class="profile-page-body"><div style="display:flex;justify-content:space-between;align-items:end;gap:12px"><div>${p.img?`<img class="avatar-big" src="${escS(p.img)}" alt="Photo of ${escS(p.name)}">`:`<div class="avatar-big" style="display:grid;place-items:center;background:var(--yellow);font:42px 'Bree Serif';color:var(--navy)">${escS(initial)}</div>`}<h2 class="page-name">${escS(p.name)}, ${p.age}</h2></div><span class="mood">New here</span></div><div class="page-grid"><div class="bio-box"><h3>About me</h3><p>${p.bio?escS(p.bio):'No bio yet \u2014 mysterious.'}</p></div><div class="bio-box"><h3>Good to know</h3><p>Real chat with real people is coming soon. For now, like the profiles you feel and check back.</p></div></div><div class="actions"><button class="action pass" onclick="switchView('discover')">&larr;</button><button class="action like" onclick="likeRealFromProfile()">LIKE</button><button class="action pass" onclick="passRealFromProfile()">&rarr;</button></div></div></article>`;switchView('profile')}
+    function likeRealFromProfile(){const p=profiles[index];if(p)showToast(`You liked ${p.name} \u2014 fingers crossed it\u2019s mutual`);index++;switchView('discover');renderDeck()}
+    function passRealFromProfile(){index++;switchView('discover');renderDeck()}
+    function renderMatches(){
+      document.getElementById('matchesGrid').innerHTML='<div class="empty-card"><h2>No matches yet.</h2><p>Hit Discover and like some real people to get things moving.</p></div>';
+      document.getElementById('miniMatches').innerHTML='<div style="padding:14px;font-size:13px;color:var(--muted)">No matches yet.</div>';
+      document.getElementById('topEight').innerHTML='<div style="grid-column:1/-1;padding:14px;font-size:12px;color:var(--muted);text-align:center">Your Top 4 will live here.</div>';
+      renderShots()}
+    function renderShots(){document.getElementById('shotTotal').textContent='0';document.getElementById('shotItems').innerHTML='<div class="shot-item">No shots yet. When somebody shoots their shot at you, it lands here.</div>'}
     function openChat(i){current=i;if(!matched.has(i)){showToast(`Match with ${profiles[i].name} before opening chat`);return}if(!unlocked.has(i)){openIcebreaker(i);return}const p=profiles[i],plan=plans[i];document.getElementById('chat').innerHTML=`<article class="chat-card"><div class="chat-head"><button aria-label="Back to matches" onclick="switchView('matches')" style="border:0;background:none;font-size:24px;cursor:pointer">←</button><img src="${p.img}" alt="Illustrated portrait of ${p.name}"><div><strong>${p.name} <span class="demo-tag">DEMO</span></strong><br><small style="color:var(--green);font-weight:700">Chat unlocked</small></div><button class="planner-launch" onclick="openPlanner(${i})">PLAN A DATE</button></div><div class="chat-body">${plan?`<div class="date-plan"><strong>DATE IDEA</strong>${esc(plan.spot)} · ${esc(plan.day)} at ${esc(plan.time)}</div>`:''}<div class="bubble them">${p.message}</div><div class="bubble me">That's a good question. Let me think...</div><div class="bubble them">No rush. A real answer is better than a fast one.</div></div><div class="chat-note">Icebreaker complete · Date planner ready · Keep private details private and meet in public</div></article>`;switchView('chat')}
     function openIcebreaker(i){current=i;if(!matched.has(i)){showToast(`Match with ${profiles[i].name} to play the icebreaker`);return}const p=profiles[i];document.getElementById('iceTitle').textContent=`${p.name}'s two truths & a lie`;document.getElementById('iceList').innerHTML=p.truths.map((t,n)=>`<button class="ice-option" onclick="guessLie(${n})">${n+1}. ${t}</button>`).join('');document.getElementById('iceResult').textContent='';document.getElementById('iceModal').classList.add('show')}
     function guessLie(n){const p=profiles[current],result=document.getElementById('iceResult');if(n===p.lie){unlocked.add(current);result.textContent=`You got it — chat with ${p.name} is unlocked.`;renderMatches();setTimeout(()=>{document.getElementById('iceModal').classList.remove('show');openChat(current)},650)}else{result.textContent='That one is true. Try another.'}}
@@ -277,7 +309,99 @@
       updateMusicTaste();showToast('Profile song removed');
     });
     window.addEventListener('beforeunload',()=>{if(songUrl)URL.revokeObjectURL(songUrl);if(voiceUrl)URL.revokeObjectURL(voiceUrl)});
-    renderDeck();renderMatches();
+    /* ---- Supabase: real accounts (publishable key is public-safe by design) ---- */
+    const sb=window.supabase.createClient('https://tdgcjihmltgphtdtwscu.supabase.co','sb_publishable_BVS8t8hIUrgA2FChJOC4OQ_WmSf-PUP');
+    let currentUser=null,myProfile=null,booted=false,authMode='login';
+    const authGate=document.getElementById('authGate'),authMsg=document.getElementById('authMsg');
+    function showAuthMsg(t,isErr){authMsg.hidden=false;authMsg.textContent=t;authMsg.classList.toggle('err',!!isErr)}
+    function hideAuthMsg(){authMsg.hidden=true;authMsg.classList.remove('err')}
+    function setAuthMode(m){authMode=m;hideAuthMsg();document.getElementById('tabLogin').classList.toggle('active',m==='login');document.getElementById('tabSignup').classList.toggle('active',m==='signup');document.getElementById('authGo').textContent=m==='login'?'LOG IN':'CREATE ACCOUNT';document.getElementById('authForm').hidden=false;document.getElementById('authCheckEmail').hidden=true}
+    document.getElementById('tabLogin').onclick=()=>setAuthMode('login');
+    document.getElementById('tabSignup').onclick=()=>setAuthMode('signup');
+    function friendlyAuthError(e){const m=String(e.message||'').toLowerCase();if(m.includes('already registered')||m.includes('already exists'))return 'That email already has an account \u2014 hit LOG IN instead.';if(m.includes('invalid login'))return 'Wrong email or password. Try again.';return e.message||'Something went wrong. Try again.'}
+    document.getElementById('authGo').onclick=async()=>{
+      const email=document.getElementById('authEmail').value.trim(),password=document.getElementById('authPass').value;
+      if(!email||!password){showAuthMsg('Enter your email and password.',true);return}
+      const go=document.getElementById('authGo');go.disabled=true;
+      try{
+        if(authMode==='signup'){
+          if(password.length<6){showAuthMsg('Password needs at least 6 characters.',true);return}
+          const {data,error}=await sb.auth.signUp({email,password});
+          if(error){showAuthMsg(friendlyAuthError(error),true);return}
+          if(data.session){enterApp(data.session.user)}
+          else{document.getElementById('authForm').hidden=true;document.getElementById('authCheckEmail').hidden=false;document.getElementById('authCheckAddr').textContent=email}
+        }else{
+          const {data,error}=await sb.auth.signInWithPassword({email,password});
+          if(error){showAuthMsg(friendlyAuthError(error),true);return}
+          enterApp(data.user);
+        }
+      }finally{go.disabled=false}
+    };
+    document.getElementById('authConfirmed').onclick=async()=>{const {data:{session}}=await sb.auth.getSession();if(session&&session.user){enterApp(session.user)}else{showToast('Not confirmed yet \u2014 tap the link in your email first')}};
+    async function doLogout(){try{await sb.auth.signOut()}finally{location.reload()}}
+    document.querySelectorAll('.logout-btn').forEach(b=>b.onclick=doLogout);
+    async function enterApp(user){
+      if(booted)return;booted=true;currentUser=user;authGate.hidden=true;
+      try{
+        const {data,error}=await sb.from('profiles').select('*').eq('id',user.id).maybeSingle();
+        if(error)throw error;
+        myProfile=data||null;
+      }catch(e){deck.innerHTML='<div class="empty-card"><h2>Could not reach the database.</h2><p>The profiles table may not exist yet. Run the setup SQL in Supabase, then refresh.</p></div>';renderMatches();return}
+      renderMyPage();
+      if(!myProfile){openSetup(true)}else{loadProfiles()}
+      renderMatches();
+    }
+    async function loadProfiles(){
+      const {data,error}=await sb.from('profiles').select('id,display_name,age,bio,photo_url').neq('id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+      if(error){deck.innerHTML='<div class="empty-card"><h2>Could not load profiles.</h2><p>Check your connection and refresh the page.</p></div>';return}
+      profiles=(data||[]).map(r=>({real:true,realId:r.id,name:r.display_name||'Somebody',age:r.age,bio:r.bio||'',img:r.photo_url||''}));
+      index=0;renderDeck();
+    }
+    const setupModal=document.getElementById('setupModal'),setupMsg=document.getElementById('setupMsg');
+    function openSetup(first){
+      document.getElementById('setupTitle').textContent=first?'Set up your page':'Edit your page';
+      document.getElementById('setupName').value=myProfile?.display_name||'';
+      document.getElementById('setupAge').value=myProfile?.age||'';
+      document.getElementById('setupBio').value=myProfile?.bio||'';
+      document.getElementById('setupPhoto').value='';
+      document.getElementById('setupPreview').hidden=true;
+      document.getElementById('setupCancel').hidden=first;
+      setupMsg.hidden=true;
+      setupModal.classList.add('show');
+    }
+    setupModal.addEventListener('click',e=>{if(e.target===setupModal&&currentUser&&!myProfile)setTimeout(()=>{if(!myProfile)setupModal.classList.add('show')},0)});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&currentUser&&!myProfile)setTimeout(()=>{if(!myProfile)setupModal.classList.add('show')},0)});
+    document.getElementById('setupPhoto').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];const pv=document.getElementById('setupPreview');if(f){pv.src=URL.createObjectURL(f);pv.hidden=false}else{pv.hidden=true}});
+    document.getElementById('setupCancel').onclick=()=>setupModal.classList.remove('show');
+    document.getElementById('saveProfile').onclick=async()=>{
+      const name=document.getElementById('setupName').value.trim(),age=parseInt(document.getElementById('setupAge').value,10),bio=document.getElementById('setupBio').value.trim();
+      const fail=t=>{setupMsg.hidden=false;setupMsg.textContent=t};
+      if(!name){fail('Give yourself a display name.');return}
+      if(!age||age<18){fail('You gotta be 18 or older to be on here.');return}
+      const sv=document.getElementById('saveProfile');sv.disabled=true;
+      try{
+        let photo_url=myProfile?.photo_url||'';
+        const file=document.getElementById('setupPhoto').files[0];
+        if(file){
+          const path=`${currentUser.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]+/g,'_')}`;
+          const {error:upErr}=await sb.storage.from('profile-photos').upload(path,file,{upsert:true});
+          if(upErr){fail('Photo upload failed: '+upErr.message);return}
+          photo_url=sb.storage.from('profile-photos').getPublicUrl(path).data.publicUrl;
+        }
+        const {data,error}=await sb.from('profiles').upsert({id:currentUser.id,display_name:name,age:age,bio:bio||null,photo_url:photo_url||null},{onConflict:'id'}).select().single();
+        if(error){fail('Could not save: '+error.message);return}
+        myProfile=data;setupModal.classList.remove('show');renderMyPage();showToast('Your page is live');loadProfiles();
+      }finally{sv.disabled=false}
+    };
+    function renderMyPage(){
+      const el=document.getElementById('myRealHead');if(!el)return;
+      if(!myProfile){el.innerHTML='';return}
+      const initial=(myProfile.display_name||'Y').trim().charAt(0).toUpperCase();
+      el.innerHTML=`<div class="bio-box" style="margin-bottom:14px"><div style="display:flex;gap:14px;align-items:center">${myProfile.photo_url?`<img src="${escS(myProfile.photo_url)}" alt="Your photo" style="width:84px;height:84px;object-fit:cover;border:2px solid var(--navy)">`:`<div style="width:84px;height:84px;display:grid;place-items:center;background:var(--yellow);border:2px solid var(--navy);font:34px 'Bree Serif';color:var(--navy)">${escS(initial)}</div>`}<div style="flex:1;min-width:0"><h3 style="margin:0 0 4px;font:24px 'Bree Serif';color:var(--navy)">${escS(myProfile.display_name)}, ${myProfile.age}</h3><p style="margin:0;font-size:13px;color:var(--muted)">${myProfile.bio?escS(myProfile.bio):'No bio yet.'}</p></div></div><button class="song-remove" type="button" id="editProfileBtn" style="margin-top:10px">EDIT MY PAGE</button></div>`;
+      document.getElementById('editProfileBtn').onclick=()=>openSetup(false);
+    }
+    sb.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){location.reload()}else if(session&&session.user){enterApp(session.user)}});
+    (async()=>{try{const {data:{session}}=await sb.auth.getSession();if(session&&session.user){enterApp(session.user)}else{authGate.hidden=false;setAuthMode('login')}}catch(e){authGate.hidden=false;setAuthMode('login');showAuthMsg('Could not reach the login service. Check your connection and refresh.',true)}})();
   </script>
 </body>
 </html>
