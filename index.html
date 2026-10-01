@@ -100,6 +100,7 @@
     .auth-card h1{font:34px/1 "Bree Serif";color:var(--navy);margin:0}
     .auth-card h1 span{color:var(--coral)}
     .auth-sub{color:var(--muted);font-weight:700;margin:6px 0 16px}
+    .auth-hero{display:block;width:100%;height:auto;border:2px solid var(--navy);box-shadow:4px 4px 0 var(--navy);margin:0 0 16px}
     .auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
     .auth-tabs button{border:2px solid var(--navy);background:#fff;padding:10px;font-weight:800;cursor:pointer;min-height:46px}
     .auth-tabs button.active{background:var(--navy);color:#fff}
@@ -118,6 +119,7 @@
     <div class="auth-card">
       <h1>PLAYING DA FIELD <span>&hearts;</span></h1>
       <p class="auth-sub">Meet somebody real.</p>
+      <img class="auth-hero" src="assets/promo-login.jpg" alt="PLAYING DA FIELD — dating app, roll for love">
       <div class="auth-tabs"><button type="button" id="tabLogin" class="active">LOG IN</button><button type="button" id="tabSignup">SIGN UP</button></div>
       <div id="authForm">
         <label class="field"><span>EMAIL</span><input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"></label>
